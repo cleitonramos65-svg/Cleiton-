@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Logo } from './Logo';
 
 interface LoginScreenProps {
   onLogin: (username: string, password: string) => boolean;
@@ -30,7 +29,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
       <div className="w-full max-w-md bg-gray-800 rounded-lg shadow-lg p-8">
-        <Logo className="w-48 mx-auto mb-8" />
+        <h1 className="text-4xl font-bold text-center text-cyan-400 mb-8">Lusa Transportes</h1>
         <form onSubmit={handleLogin} className="space-y-6">
           <div>
             <label htmlFor="username" className="block mb-2 text-sm font-medium text-gray-300">Nome de Usuário</label>

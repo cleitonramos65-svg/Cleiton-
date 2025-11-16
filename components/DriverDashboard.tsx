@@ -208,9 +208,10 @@ interface DriverDashboardProps {
   user: User;
   records: FuelingRecord[];
   onAddFueling: (data: NewRecordData) => void;
+  showNotification: (title: string, options?: NotificationOptions) => void;
 }
 
-export const DriverDashboard: React.FC<DriverDashboardProps> = ({ user, records, onAddFueling }) => {
+export const DriverDashboard: React.FC<DriverDashboardProps> = ({ user, records, onAddFueling, showNotification }) => {
     const [showFuelModal, setShowFuelModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -219,6 +220,20 @@ export const DriverDashboard: React.FC<DriverDashboardProps> = ({ user, records,
         setShowFuelModal(false);
         setSuccessMessage('Abastecimento registrado com sucesso!');
         setTimeout(() => setSuccessMessage(''), 3000); // Message disappears after 3 seconds
+        
+        // Simulate review and notify driver
+        setTimeout(() => {
+            const isApproved = Math.random() > 0.3; // 70% chance of approval
+            if (isApproved) {
+                showNotification('Registro Aprovado', {
+                    body: `Seu registro de abastecimento para ${data.vehiclePlate} foi aprovado.`,
+                });
+            } else {
+                showNotification('Registro Rejeitado', {
+                    body: `Seu registro para ${data.vehiclePlate} foi rejeitado. Verifique os dados.`,
+                });
+            }
+        }, 8000); // Simulate 8 seconds for review
     }
     
     const sortedRecords = [...records].sort((a,b) => new Date(b.recordTimestamp).getTime() - new Date(a.recordTimestamp).getTime());

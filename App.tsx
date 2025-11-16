@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LoginScreen } from './components/LoginScreen';
 import { DriverDashboard } from './components/DriverDashboard';
 import { AdminReport } from './components/AdminReport';
 import { UserManagement } from './components/UserManagement';
 import type { User, FuelingRecord, NewUserData } from './types';
 import { LogoutIcon, ReportIcon, UserPlusIcon } from './components/icons';
-import { Logo } from './components/Logo';
 
 // In a real app, this would come from a secure backend.
 const INITIAL_USERS: User[] = [
@@ -23,6 +22,24 @@ const App: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [fuelingRecords, setFuelingRecords] = useState<FuelingRecord[]>([]);
   const [view, setView] = useState<View>('driver');
+
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission !== 'granted') {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  const showNotification = (title: string, options?: NotificationOptions) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, options);
+    } else if ('Notification' in window && Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+                new Notification(title, options);
+            }
+        });
+    }
+  };
 
   const handleLogin = (username: string, password: string): boolean => {
     const user = users.find(
@@ -81,6 +98,13 @@ const App: React.FC = () => {
       };
 
       setFuelingRecords(prev => [...prev, newRecord]);
+
+      // Notify admin (simulated)
+      if (Notification.permission === 'granted') {
+        showNotification('Novo Registro Recebido', {
+            body: `${currentUser.name} enviou um novo registro para ${data.vehiclePlate}.`,
+        });
+      }
   };
   
   if (!currentUser) {
@@ -95,7 +119,7 @@ const App: React.FC = () => {
         <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center">
-               <Logo className="h-8 w-auto" />
+               <div className="text-xl font-bold text-white">Lusa Transportes</div>
             </div>
             <div className="flex items-center gap-4">
                {currentUser.role === 'admin' && (
@@ -119,7 +143,7 @@ const App: React.FC = () => {
         </nav>
       </header>
       <main>
-          {currentUser.role === 'driver' && <DriverDashboard user={currentUser} records={driverRecords} onAddFueling={handleAddFueling} />}
+          {currentUser.role === 'driver' && <DriverDashboard user={currentUser} records={driverRecords} onAddFueling={handleAddFueling} showNotification={showNotification} />}
           {currentUser.role === 'admin' && view === 'admin_report' && <AdminReport records={fuelingRecords} users={users} />}
           {currentUser.role === 'admin' && view === 'admin_users' && <UserManagement users={users} onAddUser={handleAddUser} onUpdateUserPassword={handleUpdateUserPassword} onDeleteUser={handleDeleteUser} />}
       </main>

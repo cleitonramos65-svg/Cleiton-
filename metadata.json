@@ -1,0 +1,8 @@
+{
+  "name": "Lusa Transportes",
+  "description": "An application for drivers to log their mileage and fuel expenses during routes, including photo verification for mileage and fuel stops. It also provides an admin view for reporting.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
